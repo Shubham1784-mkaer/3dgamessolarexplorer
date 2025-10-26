@@ -313,6 +313,11 @@
                     <span>Size:</span>
                     <input type="range" id="sizeScale" min="0.5" max="3" step="0.1" value="1" oninput="updateScale()">
                 </div>
+                <div class="slider-container" style="margin-top: 8px;">
+                    <span>System:</span>
+                    <input type="range" id="systemScale" min="0.3" max="2" step="0.1" value="1" oninput="updateSystemScale()">
+                    <span id="systemScaleDisplay">1x</span>
+                </div>
             </div>
         </div>
 
@@ -367,6 +372,7 @@
             trajectoryTool: false,
             selectedBody: 'earth',
             sizeScale: 1,
+            systemScale: 1,
             time: 0,
             isDragging: false,
             lastMousePos: { x: 0, y: 0 },
@@ -841,11 +847,11 @@
                     
                     if (body.parent) {
                         const parent = celestialBodies[body.parent];
-                        body.x = parent.x + Math.cos(body.angle) * body.orbitRadius;
-                        body.y = parent.y + Math.sin(body.angle) * body.orbitRadius;
+                        body.x = parent.x + Math.cos(body.angle) * body.orbitRadius * gameState.systemScale;
+                        body.y = parent.y + Math.sin(body.angle) * body.orbitRadius * gameState.systemScale;
                     } else {
-                        body.x = Math.cos(body.angle) * body.orbitRadius;
-                        body.y = Math.sin(body.angle) * body.orbitRadius;
+                        body.x = Math.cos(body.angle) * body.orbitRadius * gameState.systemScale;
+                        body.y = Math.sin(body.angle) * body.orbitRadius * gameState.systemScale;
                     }
                 }
             }
@@ -853,14 +859,14 @@
             // Update asteroids
             asteroids.forEach(asteroid => {
                 asteroid.angle += asteroid.orbitSpeed * gameState.timeSpeed * 0.016;
-                asteroid.x = Math.cos(asteroid.angle) * asteroid.orbitRadius;
-                asteroid.y = Math.sin(asteroid.angle) * asteroid.orbitRadius;
+                asteroid.x = Math.cos(asteroid.angle) * asteroid.orbitRadius * gameState.systemScale;
+                asteroid.y = Math.sin(asteroid.angle) * asteroid.orbitRadius * gameState.systemScale;
             });
 
             // Update comets with elliptical orbits
             comets.forEach(comet => {
                 comet.angle += comet.orbitSpeed * gameState.timeSpeed * 0.016;
-                const a = comet.orbitRadius;
+                const a = comet.orbitRadius * gameState.systemScale;
                 const e = comet.eccentricity;
                 const r = a * (1 - e * e) / (1 + e * Math.cos(comet.angle));
                 comet.x = r * Math.cos(comet.angle);
@@ -920,12 +926,12 @@
                 for (const body of Object.values(celestialBodies)) {
                     if (body.orbitRadius > 0 && !body.parent) {
                         ctx.beginPath();
-                        ctx.arc(0, 0, body.orbitRadius, 0, Math.PI * 2);
+                        ctx.arc(0, 0, body.orbitRadius * gameState.systemScale, 0, Math.PI * 2);
                         ctx.stroke();
                     } else if (body.parent) {
                         const parent = celestialBodies[body.parent];
                         ctx.beginPath();
-                        ctx.arc(parent.x, parent.y, body.orbitRadius, 0, Math.PI * 2);
+                        ctx.arc(parent.x, parent.y, body.orbitRadius * gameState.systemScale, 0, Math.PI * 2);
                         ctx.stroke();
                     }
                 }
@@ -1304,6 +1310,11 @@
             gameState.sizeScale = parseFloat(document.getElementById('sizeScale').value);
         }
 
+        function updateSystemScale() {
+            gameState.systemScale = parseFloat(document.getElementById('systemScale').value);
+            document.getElementById('systemScaleDisplay').textContent = gameState.systemScale.toFixed(1) + 'x';
+        }
+
         function toggleSection(sectionName) {
             const content = document.getElementById(sectionName + '-content');
             const arrow = document.getElementById(sectionName + '-arrow');
@@ -1324,5 +1335,5 @@
         resizeCanvas();
         gameLoop();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'994bb66bf1f4a849',t:'MTc2MTUwMDE1Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'994bbef12628a849',t:'MTc2MTUwMDUwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
